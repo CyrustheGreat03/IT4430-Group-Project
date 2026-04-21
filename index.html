@@ -34,9 +34,15 @@
                     <input id="user_search" type="text" placeholder="Search for a movie or (possibly genre?)">
                     <button id = "search_button">Search</button>
                 </div>
-                <div class = "content_area" id = "top_rated_movies">Top rated Movies</div>
+
+               
+
                 <div class = "content_area" id = "movie_collection">Collection of stored movies</div>
                 <div class = "content_area" id = "search_by_genre">ability to look for movies by genre.</div>
+                <div id="movie_details"></div>
+                <h2> Top Rated Movies</h2>
+                <div class = "content_area" id = "top_rated_movies"></div>
+                
             </div>
         </div>
     </body>
@@ -53,6 +59,8 @@ $('#search_button').click(function(){ // search button
     result_number()
 })
 
+//SEARCH RESULTS
+
 function result_number(){
     $("#movie_collection").html("")
 
@@ -62,6 +70,7 @@ function result_number(){
 
 
     $.get(url, function(json_movies){
+    
         for (i=0; i<json_movies.results.length; i++){
 
         title = json_movies.results[i].title
@@ -96,11 +105,100 @@ function result_number(){
         }
 })
 }
-    
+
+//DETAILS WHEN CLICKING ON TITLE... IN PROGRESS (GENRE, CAST ISSUES)
+
+$(document).on("click", ".click", function(){
+    id=$(this).data("id")
+    url = "https://api.themoviedb.org/3/movie/" + id + "?api_key=" + api_key 
+   
+    $.getJSON(url, function(json_movie){
+
+
+        title=json_movie.title
+        rating=json_movie.vote_average
+        date=json_movie.release_date
+        genres=json_movie.genres //Why is genre breaking?
+        //cast: ... 
+        language=json_movie.original_language
+        thumbnail="https://image.tmdb.org/t/p/w500" + json_movie.poster_path
+
+
+        document.getElementById("movie_details").scrollIntoView()
+
+        $("#movie_details").html(`
+
+            <div class="Movie_Background">
+                <img src="${thumbnail}" class="Img">
+                <div class="Movie_Info">
+                    <h2>${title}</h2>
+                    <p><b>Rating:</b> ${rating}</p>
+                    <p><b>Date:</b> ${date}</p>
+                    <p><b>Genres:</b> ${genres}</p>
+                    
+                    <p><b>Langauge:</b> ${language}</p>
+                    <button id="favorite"> Add to Favorites </button>
+                </div>
+            </div>
+
+        
+        `)
+                })
+            })
+
+//COLLECTION of POPULAR CONTENT 
+
+url_popular = "https://api.themoviedb.org/3/movie/popular?api_key=e385f2f999e5722091095f17147c4465"
+
+
+$.getJSON(url_popular, function(Popular_Content){
+
+    for (i=0; i<Popular_Content.results.length; i++){
+
+        title=Popular_Content.results[i].title
+        id=Popular_Content.results[i].id
+        rating=Popular_Content.results[i].vote_average
+        date=Popular_Content.results[i].release_date
+        language=Popular_Content.results[i].original_language
+        thumbnail="https://image.tmdb.org/t/p/w500" + Popular_Content.results[i].poster_path
+
+
+    $("#top_rated_movies").append(`
+
+        <div class="Movie_Background">
+                <img src="${thumbnail}" class="Img">
+                <div class="Movie_Info">
+                    <h3 class="click" data-id="${id}" style="cursor:pointer"> 
+                         ${title} 
+                     </h3>
+                    <p><b>Rating:</b> ${rating}</p>
+                    <p><b>Date:</b> ${date}</p>
+                    <p><b>Langauge:</b> ${language}</p>
+                    <button id="favorite"> Add to Favorites </button>
+
+    `)
+
+                }
+
+
+})
+
+
 </script>
 
 
 <style> 
+
+#top_rated_movies{
+
+    display: grid;
+    gap: 20px;
+    margin-top: 50px;
+    grid-template-columns:repeat(3, 325px); /* CITE: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns */
+    text-align: center;
+    justify-content: center;
+    
+}
 
 body{
     background-color: bisque;
@@ -173,10 +271,17 @@ nav a {
     width: 200px;
     height: auto;
     border-radius: 20px;
+}
 
-
+#movie_details{
+    text-align: left;
+    margin-top: 50px;
+    margin-bottom: 30px;
 }
 
 
+
+
+ 
 </style>
 
