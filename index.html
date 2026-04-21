@@ -3,7 +3,7 @@
     <head>
         <meta charset='utf-8'>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel = "stylesheet" href="style.css">
+        <link rel = "stylesheet" href="">
         <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
     </head>
     <body>
@@ -198,7 +198,7 @@ function addFavorite(fave_id){                                                  
 }
 /* Remove Item from favorites list */
 function removeFavorite(bad_id){ 
-    bad_id = Number(bad_id);
+    let bad_id = Number(bad_id);                                                              // Overwrites the parameter bad ID
     let favorites = getFavorites();
     let new_favorites = favorites.filter(id=> id != bad_id);                                  // filters the list and saves it under a new varname
     localStorage.setItem("favorites", JSON.stringify(new_favorites));                         // saves the new updated list in local storage
