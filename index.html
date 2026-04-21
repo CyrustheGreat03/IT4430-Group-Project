@@ -50,7 +50,6 @@
 </html>
 
 <script> 
-
 user_input = ""
 api_key = "e385f2f999e5722091095f17147c4465" 
 
@@ -174,7 +173,7 @@ $.getJSON(url_popular, function(Popular_Content){
                     <p><b>Rating:</b> ${rating}</p>
                     <p><b>Date:</b> ${date}</p>
                     <p><b>Langauge:</b> ${language}</p>
-                    <button id="favorite"> Add to Favorites </button>
+                    <button id="favorite-btn" data-id="${id}"> Add to Favorites </button>
 
     `)
 
@@ -182,7 +181,46 @@ $.getJSON(url_popular, function(Popular_Content){
 
 
 })
+                                                                                            // ensuring favorites exists in local storage
+    if(!localStorage.getItem("favorites")){                                                 // checks to see if favorites exists
+        // if it does not then make it.
+        localStorage.setItem("favorites", JSON.stringify([])); //CITE: https://www.w3schools.com/jsref/prop_win_localstorage.asp
+    }
+ /* Add Item to the favorites list*/   
+function addFavorite(fave_id){                                                               // function for adding favorites to local storage
+    let movie_id = fave_id;    
+    let favorites = JSON.parse(localStorage.getItem("favorites"));                           // retrieve favorites list from local storage
 
+    if (!favorites.includes(movie_id)){                                                      // checks to see if the movie is already in the list
+        favorites.push(movie_id);                                                            // pushes the movie into the list
+        localStorage.setItem("favorites", JSON.stringify(favorites));                        // converts the list back to a string with the new item a part of it and sends it to local storage.
+    }
+}
+/* Remove Item from favorites list */
+function removeFavorite(bad_id){ 
+    bad_id = Number(bad_id);
+    let favorites = getFavorites();
+    let new_favorites = favorites.filter(id=> id != bad_id);                                  // filters the list and saves it under a new varname
+    localStorage.setItem("favorites", JSON.stringify(new_favorites));                         // saves the new updated list in local storage
+}
+/*Get the Favorites list*/
+function getFavorites(){return JSON.parse(localStorage.getItem("favorites"));}                 // returns the list of favorite IDs
+function isFavorite(m_id){
+    let favorites = getFavorites();                                                             // favorites list scope = function
+    return favorites.includes(Number(m_id));                                                    // returns whether or not the movie is in the favorites list
+}
+    
+$("#favorite-btn").on("click",function(){
+    let fave_id = Number($(this).data("id"));                                                   // retrieves the movie ID
+
+    if (isFavorite(fave_id)){                                                                    // check if the movie is in favorites list
+        removeFavorite(fave_id);                                                                 // remove it and change text to remove from favorites
+        $(this).text("Add to Favorites");                                                        // Change text to add
+    } else{
+        addFavorite(fave_id);                                                                    // else add it to favorites
+        $(this).text("Remove From Favorites");                                                   // Change text to remove
+    }
+});
 
 </script>
 
