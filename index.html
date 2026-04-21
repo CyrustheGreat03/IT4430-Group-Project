@@ -136,7 +136,7 @@ $(document).on("click", ".click", function(){
                     <p><b>Genres:</b> ${genres}</p>
                     
                     <p><b>Langauge:</b> ${language}</p>
-                    <button id="favorite"> Add to Favorites </button>
+                    <button id="favorite-btn"> Add to Favorites </button>
                 </div>
             </div>
 
@@ -198,7 +198,6 @@ function addFavorite(fave_id){                                                  
 }
 /* Remove Item from favorites list */
 function removeFavorite(bad_id){ 
-    let bad_id = Number(bad_id);                                                              // Overwrites the parameter bad ID
     let favorites = getFavorites();
     let new_favorites = favorites.filter(id=> id != bad_id);                                  // filters the list and saves it under a new varname
     localStorage.setItem("favorites", JSON.stringify(new_favorites));                         // saves the new updated list in local storage
@@ -206,22 +205,21 @@ function removeFavorite(bad_id){
 /*Get the Favorites list*/
 function getFavorites(){return JSON.parse(localStorage.getItem("favorites"));}                 // returns the list of favorite IDs
 function isFavorite(m_id){
-    let favorites = getFavorites();                                                             // favorites list scope = function
-    return favorites.includes(Number(m_id));                                                    // returns whether or not the movie is in the favorites list
+    let favorites = JSON.parse(localStorage.getItem("favorites"));
+    return favorites.includes(m_id);
 }
     
-$("#favorite-btn").on("click",function(){
-    let fave_id = Number($(this).data("id"));                                                   // retrieves the movie ID
+$(document).on("click","#favorite-btn",function(){
+    let fave_id = $(this).data("id");                                                        // retrieves the movie ID
 
-    if (isFavorite(fave_id)){                                                                    // check if the movie is in favorites list
-        removeFavorite(fave_id);                                                                 // remove it and change text to remove from favorites
-        $(this).text("Add to Favorites");                                                        // Change text to add
+    if (isFavorite(fave_id)){                                                                // check if the movie is in favorites list
+        removeFavorite(fave_id);                                                             // remove it and change text to remove from favorites
+        $(this).text("Add to Favorites");                                                    // Change text to add
     } else{
-        addFavorite(fave_id);                                                                    // else add it to favorites
-        $(this).text("Remove From Favorites");                                                   // Change text to remove
+        addFavorite(fave_id);                                                                // else add it to favorites
+        $(this).text("Remove From Favorites");                                                // Change text to remove
     }
 });
-
 </script>
 
 
