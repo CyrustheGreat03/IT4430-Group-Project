@@ -20,7 +20,6 @@
         <nav>
         <a href="index.html"> SEARCH </a>
         <button class = "nav_button" id = "nav_favorites">FAVORITES</a>
-        <a href="XXX.html"> </a>
         </nav>
 
    
@@ -33,13 +32,22 @@
                 <div class = "content_area" id = "movie_search">
                     <input id="user_search" type="text" placeholder="Search for a movie or (possibly genre?)">
                     <button id = "search_button">Search</button>
+
+                <br>
+                <br>
+                <select id="genre">
+                
+                    <option id=""> Select Genre </option>
+                </select>
+                    <button id="Select_Genre"> Search Genre </button>
+                
                 </div>
 
 
                 <div class = "section_header" style = "cursor:pointer"><h2>Favorite Movies</h2></div>
                 <div class = "content_area" id = "favorites_collection" style = "display: none;"></div>
-                <div class = "content_area" id = "movie_collection">Collection of stored movies</div>
-                <div class = "content_area" id = "search_by_genre">ability to look for movies by genre.</div>
+                <div class = "content_area" id = "movie_collection"></div>
+                <div class = "content_area" id = "search_by_genre"></div>
                 <div id="movie_details"></div>
                 <h2> Top Rated Movies</h2>
                 <div class = "content_area" id = "top_rated_movies"></div>
@@ -104,6 +112,8 @@ function result_number(){
                         <div class="preview">
                             <a href="https://themoviedb.org/movie/${id}" target="_blank">Preview Movie</a>
                         </div>
+                        <br>
+                        <button id="favorite-btn" data-id="${id}"> Add to Favorites </button>
 
                     </div>
                 </div>
@@ -111,6 +121,76 @@ function result_number(){
 `) 
         }
 })
+}
+
+
+//GENRE SELECTION
+
+url = "https://api.themoviedb.org/3/genre/movie/list?api_key=e385f2f999e5722091095f17147c4465" + "&language=en" //CITE: https://developer.themoviedb.org/reference/genre-movie-list
+
+//Retrives dropdown information (Name, id number)
+
+$.getJSON(url, function(json_genres){
+    for (i=0; i<json_genres.genres.length; i++){ //Loops for each 
+        genre_name = json_genres.genres[i].name
+        genre_id_number = json_genres.genres[i].id
+
+        $("#genre").append(`
+        
+            <option value="${genre_id_number}"> ${genre_name}</option>
+        
+        `)
+    }
+})
+
+$('#Select_Genre').click(function(){
+
+genre_number=$('#genre').val() 
+genre_search(genre_number)
+})
+
+function genre_search(genre_number){
+    $("#movie_collection").html("")
+    //Use /discover/movie for genre search
+    url = "https://api.themoviedb.org/3/discover/movie?api_key=e385f2f999e5722091095f17147c4465" + "&with_genres=" + genre_number
+
+$.getJSON(url, function(json_genre){
+    for (i=0; i<json_genre.results.length; i++){ //same format
+
+        title = json_genre.results[i].title
+        id = json_genre.results[i].id
+        overview = json_genre.results[i].overview
+        rating = json_genre.results[i].vote_average
+        date = json_genre.results[i].release_date
+        thumbnail = "https://image.tmdb.org/t/p/w500" + json_genre.results[i].poster_path
+
+
+        $("#movie_collection").append(`
+            <div class="Movie_Background">
+                    <img src="${thumbnail}" class="Img">
+                    <div class="Movie_Info">
+                        
+                        <h3 class="click" data-id="${id}" style="cursor:pointer"> 
+                            ${title}
+                        </h3>
+
+                        <p><b>Overview:</b> ${overview}</p>
+                        <p><b>Date:</b> ${date}</p>
+                        <p><b>Rating:</b> ${rating}</p>
+
+                        <div class="preview">
+                            <a href="https://themoviedb.org/movie/${id}" target="_blank">Preview Movie</a>
+                        </div>
+                        <br>
+                        <button id="favorite-btn" data-id="${id}"> Add to Favorites </button>
+
+                    </div>
+                </div>
+        
+`) 
+            }
+        })
+
 }
 
 //DETAILS WHEN CLICKING ON TITLE... IN PROGRESS (GENRE, CAST ISSUES)
@@ -151,6 +231,7 @@ $(document).on("click", ".click", function(){
         
         `)
                 })
+            
             })
 
 //COLLECTION of POPULAR CONTENT 
@@ -289,7 +370,7 @@ function showfavorites(){
 }
 
 body{
-    background-color: bisque;
+    background-color: lightskyblue;
 }
 
 header {
@@ -384,7 +465,33 @@ nav a {
     align-items: left;
 }
 
+@media (max-width: 768px){
+    
+#user_search {
+    width: 200px;
+}
 
- 
+#movie_collection{
+    grid-template-columns:repeat(3, 1fr); /* CITE: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns */
+
+
+}
+
+#top_rated_movies{
+    grid-template-columns:repeat(3, 1fr); /* CITE: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns */
+
+
+}
+
+.full_web {
+    padding: 10px;
+}
+
+.Movie_Background {
+
+    padding: 10px;
+    border-radius: 10px;
+}
+}
+
 </style>
-
