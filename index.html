@@ -33,6 +33,8 @@
                     <input id="user_search" type="text" placeholder="Search for a movie or (possibly genre?)">
                     <button id = "search_button">Search</button>
 
+                <div id="pagination"></div>
+
                 <br>
                 <br>
                 <select id="genre">
@@ -59,6 +61,7 @@
 </html>
 
 <script> 
+startIndex = 1
 user_input = ""
 api_key = "e385f2f999e5722091095f17147c4465" 
 
@@ -68,7 +71,7 @@ $('#search_button').click(function(){ // search button
 })
 $(document).on('click','.section_header',function(){                              // click handler for the section titles
     let text = $(this).text();                                                    // stores section text in a variable
-    if(text = "Favorite Movies"){                                                 // conditional for reusability    
+    if(text === "Favorite Movies"){                                                 // conditional for reusability    
         showfavorites();                                                          // call function to show the favorite movies
     }
     else{console.log(text);}                                                       // otherwise log the text in the console
@@ -81,7 +84,7 @@ function result_number(){
 
     ex_url="https://api.themoviedb.org/3/search/movie?api_key=e385f2f999e5722091095f17147c4465&query=batman" //For reference
 
-    url = "https://api.themoviedb.org/3/search/movie?api_key=" + api_key + "&query=" + user_input
+    url = "https://api.themoviedb.org/3/search/movie?api_key=" + api_key + "&query=" + user_input + "&page=" + startIndex
 
 
     $.get(url, function(json_movies){
@@ -119,9 +122,28 @@ function result_number(){
                 </div>
         
 `) 
+        
         }
+        pagination(json_movies)
 })
 }
+
+function pagination (Movies){
+    $("#pagination").html("")
+
+    for (i=0;i<5;i++){ //makes sure there are 5 pages
+    litup = (i+1 === startIndex) ? "litupPage" : ""
+
+    $("#pagination").append(`<button class="numpages ${litup}" data-page="${i+1}">${i+1}</button>`) // lituppage used for indication of the correct page button
+
+
+    }
+}
+
+$(document).on("click", ".numpages", function(){
+    startIndex=$(this).data("page")
+    result_number()
+})
 
 
 //GENRE SELECTION
@@ -188,6 +210,7 @@ $.getJSON(url, function(json_genre){
                 </div>
         
 `) 
+        
             }
         })
 
@@ -465,7 +488,17 @@ nav a {
     align-items: left;
 }
 
-@media (max-width: 600px){
+#pagination button{
+    margin: 15px;
+    padding: 5px 10px;
+}
+
+.numpages.litupPage{
+    background-color: black;
+    color: white;
+}
+
+@media (max-width: 768px){
     
 #user_search {
     width: 200px;
