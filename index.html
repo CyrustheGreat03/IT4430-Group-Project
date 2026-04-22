@@ -19,7 +19,7 @@
 
         <nav>
         <a href="index.html"> SEARCH </a>
-        <a href="favorites.html">FAVORITES</a>
+        <button class = "nav_button" id = "nav_favorites">FAVORITES</a>
         <a href="XXX.html"> </a>
         </nav>
 
@@ -35,8 +35,9 @@
                     <button id = "search_button">Search</button>
                 </div>
 
-               
 
+                <div class = "section_header" style = "cursor:pointer"><h2>Favorite Movies</h2></div>
+                <div class = "content_area" id = "favorites_collection" style = "display: none;"></div>
                 <div class = "content_area" id = "movie_collection">Collection of stored movies</div>
                 <div class = "content_area" id = "search_by_genre">ability to look for movies by genre.</div>
                 <div id="movie_details"></div>
@@ -57,6 +58,13 @@ $('#search_button').click(function(){ // search button
     user_input=$('#user_search').val()
     result_number()
 })
+$(document).on('click','.section_header',function(){                              // click handler for the section titles
+    let text = $(this).text();                                                    // stores section text in a variable
+    if(text = "Favorite Movies"){                                                 // conditional for reusability    
+        showfavorites();                                                          // call function to show the favorite movies
+    }
+    else{console.log(text);}                                                       // otherwise log the text in the console
+});
 
 //SEARCH RESULTS
 
@@ -220,6 +228,50 @@ $(document).on("click","#favorite-btn",function(){
         $(this).text("Remove From Favorites");                                                // Change text to remove
     }
 });
+$("#nav_favorites").click(function(){                                                    // click handler for the favorites button
+        showfavorites();                                                                 // calls showfavorites() to display the favorite movies marked in this session.
+});
+/*Function to build the favorite movie section*/
+function showfavorites(){
+    $("#favorites_collection").slideToggle();                                            // toggles the slide animation to show/hide section
+    let favorites = getFavorites();                                                      // saves favorites list to an array
+    
+
+    if(favorites.length == 0){                                                                  // if list is empty favorites notify user.
+        alert("No Favorites selected!");                                                  // alerts that the favorites list is empty
+        return;
+    }
+
+    $("#favorites_collection").html(`<div id = "favorites-grid" class = grid></div>`);            //container creation
+    favorites.forEach(id => {                                          // for each item in favorites
+        favoriteMovieCard(id);                                        // create the movie card
+    });
+}
+    function favoriteMovieCard(m_id){
+        $.getJSON(`https://api.themoviedb.org/3/movie/${encodeURIComponent(m_id)}?api_key=${api_key}`, function(faveMovie){  // requests movie information from the ID
+            let thumbnail = `https://image.tmdb.org/t/p/w200${faveMovie.poster_path}`;            //thumbnail path
+            let title = faveMovie.title;                                                          // Title
+            let id = faveMovie.id|| m_id;                                                         //id either pulled from JSON or passed through by params if JSON doesn't have it
+            let rating = faveMovie.rating;                                                        // Movie Rating
+            let date = faveMovie.release_date;                                                    // Movie Release date
+            let language = faveMovie.original_language;                                           // movie language
+
+            let grid_item = `
+            <div class = Movie_Background>
+                <img src="${thumbnail}" class="Img">
+                <div class="Movie_Info">
+                    <h3 class="click" data-id="${id}" style="cursor:pointer"> 
+                         ${title} 
+                     </h3>
+                    <p><b>Rating:</b> ${rating}</p>
+                    <p><b>Date:</b> ${date}</p>
+                    <p><b>Langauge:</b> ${language}</p>
+                    <button id="favorite-btn" data-id="${id}"> Remove From Favorites </button>
+            </div>
+            `;                                                                                    // movie card based on above work
+            $('#favorites_collection').append(grid_item);                                          // appends this to the grid.
+        });
+    }
 </script>
 
 
@@ -275,6 +327,14 @@ nav a {
     margin-left: 10px;
 
 }
+.nav_button{
+    text-decoration: none;
+    background-color: black;
+    color:white;
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin-left: 10px;
+}
 
 .main_content_container{
     text-align: center;
@@ -314,8 +374,15 @@ nav a {
     margin-top: 50px;
     margin-bottom: 30px;
 }
-
-
+#favorites_collection{
+    display: grid;
+    gap: 20px;
+    margin-top: 50px;
+    grid-template-columns:repeat(3, 325px); /* CITE: https://developer.mozilla.org/en-US/docs/Web/CSS/Reference/Properties/grid-template-columns */
+    text-align: center;
+    margin-bottom: 50px;
+    align-items: left;
+}
 
 
  
