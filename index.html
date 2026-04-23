@@ -228,7 +228,7 @@ $(document).on("click", ".click", function(){
         title=json_movie.title
         rating=json_movie.vote_average
         date=json_movie.release_date
-        genres=json_movie.genres //Why is genre breaking?
+        genres=json_movie.genres.map(g=>g.name).join(", ")) //Why is genre breaking? -  Fixed using Direct mapping something I learned in Milestone 4
         //cast: ... 
         language=json_movie.original_language
         thumbnail="https://image.tmdb.org/t/p/w500" + json_movie.poster_path
