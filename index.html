@@ -220,7 +220,7 @@ $.getJSON(url, function(json_genre){
 
 $(document).on("click", ".click", function(){
     id=$(this).data("id")
-    url = "https://api.themoviedb.org/3/movie/" + id + "?api_key=" + api_key 
+    url = "https://api.themoviedb.org/3/movie/" + id + "?api_key=" + api_key +"&append_to_response=credits"
    
     $.getJSON(url, function(json_movie){
 
@@ -228,35 +228,39 @@ $(document).on("click", ".click", function(){
         title=json_movie.title
         rating=json_movie.vote_average
         date=json_movie.release_date
-        genres=json_movie.genres.map(g=>g.name).join(", ") //Why is genre breaking? -  Fixed using Direct mapping something I learned in Milestone 4
+        genres=json_movie.genres.map(g=>g.name).join(", ") //Why is genre breaking?
+        cast = json_movie.credits.cast.slice(0,5).map(c=>c.name).join(", ");
+        crew = json_movie.credits.crew.slice(0,5).map(c=>c.name).join(", ");
+        production_companies = json_movie.production_companies.map(p=>p.name).join(", ");
         //cast: ... 
         language=json_movie.original_language
         thumbnail="https://image.tmdb.org/t/p/w500" + json_movie.poster_path
+        overview = json_movie.overview
 
 
         document.getElementById("movie_details").scrollIntoView()
 
         $("#movie_details").html(`
 
-            <div class="Movie_Background">
+            <div class="Movie_Details_Background">
                 <img src="${thumbnail}" class="Img">
                 <div class="Movie_Info">
                     <h2>${title}</h2>
                     <p><b>Rating:</b> ${rating}</p>
                     <p><b>Date:</b> ${date}</p>
                     <p><b>Genres:</b> ${genres}</p>
-                    
                     <p><b>Langauge:</b> ${language}</p>
+                    <p><b>Overview:</b></br>${overview}</p>
+                    <p><b>Cast:</b>${cast}</p>
+                    <p><b>Crew:</b>${crew}</p>
+                    <p><b>Production companies:</b>${production_companies}</p>
                     <button id="favorite-btn"> Add to Favorites </button>
                 </div>
             </div>
-
-        
         `)
                 })
             
             })
-
 //COLLECTION of POPULAR CONTENT 
 
 url_popular = "https://api.themoviedb.org/3/movie/popular?api_key=e385f2f999e5722091095f17147c4465"
@@ -458,6 +462,15 @@ nav a {
     background-color: white;
     padding: 20px;
     border-radius: 20px;
+}
+.Movie_Details_Background {
+    background-color: white;
+    padding: 20px;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 20px;
 }
 
 .preview{
