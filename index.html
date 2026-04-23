@@ -350,7 +350,7 @@ function showfavorites(){
         return;
     }
 
-    $("#favorites_collection").html(`<div id = "favorites-grid" class = grid></div>`);            //container creation
+    $("#favorites_collection").html(`<div id = "favorites-grid" class = "grid"></div>`);            //container creation
     favorites.forEach(id => {                                          // for each item in favorites
         favoriteMovieCard(id);                                        // create the movie card
     });
